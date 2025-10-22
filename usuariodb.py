@@ -18,7 +18,12 @@ while True:
         nome = input("Nome: ")
         email = input("Email: ")
         cpf = input("CPF: ")
-        database.inserir_cliente(nome, email, cpf)
+        saldo = input("Saldo inicial (R$): ")
+        try:
+            saldo = float(saldo)
+        except ValueError:
+            saldo = 0.0
+        database.cadastrar_cliente(nome, email, cpf, saldo)
         print("✅ Cliente cadastrado com sucesso!")
 
     elif opcao == "2":
@@ -26,7 +31,12 @@ while True:
         if clientes:
             print("\n=== CLIENTES CADASTRADOS ===")
             for c in clientes:
-                print(f"ID: {c[0]} | Nome: {c[1]} | Email: {c[2]} | CPF: {c[3]} | Saldo: R${c[4]:.2f}")
+                idc = c[0]
+                nome = c[1] or ""
+                email = c[2] or ""
+                cpf = c[3] or ""
+                saldo = float(c[4]) if c[4] is not None else 0.0
+                print(f"ID: {idc} | Nome: {nome} | Email: {email} | CPF: {cpf} | Saldo: R${saldo:.2f}")
         else:
             print("Nenhum cliente encontrado.")
 
@@ -36,23 +46,32 @@ while True:
         if resultados:
             print("\n=== RESULTADOS DA BUSCA ===")
             for r in resultados:
-                print(f"ID: {r[0]} | Nome: {r[1]} | Email: {r[2]} | CPF: {r[3]} | Saldo: R${r[4]:.2f}")
+                idc = r[0]
+                nome = r[1] or ""
+                email = r[2] or ""
+                cpf = r[3] or ""
+                saldo = float(r[4]) if r[4] is not None else 0.0
+                print(f"ID: {idc} | Nome: {nome} | Email: {email} | CPF: {cpf} | Saldo: R${saldo:.2f}")
         else:
             print("⚠️ Nenhum cliente encontrado com esse termo.")
 
     elif opcao == "4":
-        id_cliente = input("ID do cliente: ")
-        novo_saldo = float(input("Novo saldo: R$"))
-        database.atualizar_saldo(id_cliente, novo_saldo)
-        print("💰 Saldo atualizado com sucesso!")
+        id_cliente = input("Digite o ID do cliente: ")
+        novo_saldo = input("Novo saldo (R$): ")
+        try:
+            novo_saldo = float(novo_saldo)
+            database.editar_saldo(id_cliente, novo_saldo)
+            print("✅ Saldo atualizado com sucesso!")
+        except ValueError:
+            print("⚠️ Valor inválido para saldo.")
 
     elif opcao == "5":
-        id_cliente = input("ID do cliente a ser deletado: ")
+        id_cliente = input("Digite o ID do cliente a ser deletado: ")
         database.deletar_cliente(id_cliente)
         print("🗑️ Cliente deletado com sucesso!")
 
     elif opcao == "6":
-        print("Saindo...")
+        print("👋 Saindo do sistema...")
         break
 
     else:

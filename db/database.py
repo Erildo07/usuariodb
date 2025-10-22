@@ -1,74 +1,75 @@
-import os
 import sqlite3
 
-# Caminho do banco
-pasta_db = os.path.dirname(__file__)
-arquivo_db = os.path.join(pasta_db, "clientes.db")
-
-# Conexão
 def conectar():
-    if not os.path.exists(pasta_db):
-        os.makedirs(pasta_db)
-    conexao = sqlite3.connect(arquivo_db)
-    return conexao
+    return sqlite3.connect('clientes.db')
 
-# Criar tabela
 def criar_tabela():
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("""
+    conn = conectar()
+    c = conn.cursor()
+    # tabela clientes
+    c.execute('''
         CREATE TABLE IF NOT EXISTS clientes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT NOT NULL,
             email TEXT,
-            cpf TEXT UNIQUE,
+            cpf TEXT,
             saldo REAL DEFAULT 0
         )
-    """)
-    conexao.commit()
-    conexao.close()
+    ''')
+    # tabela usuários
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL
+        )
+    ''')
+    # cria usuário padrão
+    c.execute("INSERT OR IGNORE INTO usuarios (id, username, password) VALUES (1,'admin','admin')")
+    conn.commit()
+    conn.close()
 
-# Inserir cliente
-def inserir_cliente(nome, email, cpf):
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("INSERT INTO clientes (nome, email, cpf) VALUES (?, ?, ?)", (nome, email, cpf))
-    conexao.commit()
-    conexao.close()
+def verificar_usuario(username, password):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('SELECT * FROM usuarios WHERE username=? AND password=?', (username, password))
+    user = c.fetchone()
+    conn.close()
+    return user
 
-# Listar todos os clientes
+def cadastrar_cliente(nome, email, cpf, saldo):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('INSERT INTO clientes (nome, email, cpf, saldo) VALUES (?, ?, ?, ?)', (nome, email, cpf, saldo))
+    conn.commit()
+    conn.close()
+
 def listar_clientes():
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("SELECT id, nome, email, cpf, saldo FROM clientes")
-    dados = cursor.fetchall()
-    conexao.close()
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('SELECT * FROM clientes')
+    dados = c.fetchall()
+    conn.close()
     return dados
 
-# Buscar por nome ou email ou CPF
-def buscar_cliente(termo):
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("""
-        SELECT id, nome, email, cpf, saldo FROM clientes
-        WHERE nome LIKE ? OR email LIKE ? OR cpf LIKE ?
-    """, (f"%{termo}%", f"%{termo}%", f"%{termo}%"))
-    resultado = cursor.fetchall()
-    conexao.close()
-    return resultado
+def buscar_cliente(busca):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('SELECT * FROM clientes WHERE nome LIKE ? OR email LIKE ? OR cpf LIKE ?', (f'%{busca}%', f'%{busca}%', f'%{busca}%'))
+    dados = c.fetchall()
+    conn.close()
+    return dados
 
-# Atualizar saldo
-def atualizar_saldo(id_cliente, novo_saldo):
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("UPDATE clientes SET saldo = ? WHERE id = ?", (novo_saldo, id_cliente))
-    conexao.commit()
-    conexao.close()
+def editar_saldo(id_cliente, novo_saldo):
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('UPDATE clientes SET saldo=? WHERE id=?', (novo_saldo, id_cliente))
+    conn.commit()
+    conn.close()
 
-# Deletar cliente
 def deletar_cliente(id_cliente):
-    conexao = conectar()
-    cursor = conexao.cursor()
-    cursor.execute("DELETE FROM clientes WHERE id = ?", (id_cliente,))
-    conexao.commit()
-    conexao.close()
+    conn = conectar()
+    c = conn.cursor()
+    c.execute('DELETE FROM clientes WHERE id=?', (id_cliente,))
+    conn.commit()
+    conn.close()
