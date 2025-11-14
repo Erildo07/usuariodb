@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Buscar Cliente</title>
+    <title>Deletar Cliente</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -38,14 +38,14 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .form-container input[type="text"] {
+        input[type="number"] {
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 6px;
         }
 
-        .form-container button, .btn-principal {
+        button, .btn-principal {
             text-decoration: none;
             background: linear-gradient(120deg, #42a5f5, #1e88e5);
             color: white;
@@ -60,68 +60,35 @@
             cursor: pointer;
         }
 
-        .form-container button:hover, .btn-principal:hover {
+        button:hover, .btn-principal:hover {
             background: linear-gradient(135deg, #64b5f6, #1976d2);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        .form-container button:active, .btn-principal:active {
+        button:active, .btn-principal:active {
             transform: scale(0.98);
         }
 
-        .resultado-lista {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-        }
-
-        .resultado-lista li {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            font-size: 16px;
-        }
-
-        p {
+        .alert {
             color: #d32f2f;
-        }
-
-        a.btn-principal {
-            display: block;
-            margin: 20px auto 0 auto;
-            width: 200px;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <h1>🔍 Buscar Cliente</h1>
+<h1>🗑️ Deletar Cliente</h1>
 
-    <div class="form-container">
-        <form method="POST">
-            <!-- Ajustado para 'busca' para combinar com o app.py -->
-            <input type="text" name="busca" placeholder="Digite nome, e-mail ou CPF" required>
-            <button type="submit">Buscar</button>
-        </form>
+<div class="form-container">
+    <form method="POST">
+        <input type="number" name="id" placeholder="Digite o ID do cliente" required>
+        <button type="submit">Deletar</button>
+    </form>
 
-        {% if resultados %}
-    <ul class="resultado-lista">
-        {% for r in resultados %}
-            <li>
-                {{ r[1] }} |
-                Email: {{ r[2] or "Não informado" }} |
-                CPF: {{ r[3] or "Não informado" }} |
-                Saldo: R$ {{ "%.2f"|format(r[4] if r[4] else 0) }}
-            </li>
-        {% endfor %}
-    </ul>
-{% elif resultados is not none %}
-    <p>⚠️ Nenhum cliente encontrado.</p>
-{% endif %}
-
-
-        <a class="btn-principal" href="{{ url_for('menu') }}">Voltar ao Menu</a>
-    </div>
+    <a class="btn-principal" href="{{ url_for('menu') }}">Voltar ao Menu</a>
+</div>
 
 </body>
 </html>
